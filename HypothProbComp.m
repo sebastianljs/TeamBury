@@ -480,6 +480,16 @@ scorecelltube2{(length(scorecelltube2)+1),1} = 1;
 scorecelltube3{(length(scorecelltube3)+1),1} = 1;
 scorecelltube4{(length(scorecelltube4)+1),1} = 1;
 
+fh = @(x) all(isnan(x(:)));
+chosenlinescell(cellfun(fh, chosenlinescell)) = [];
+chosenlinescell2(cellfun(fh, chosenlinescell2)) = [];
+chosenlinescell3(cellfun(fh, chosenlinescell3)) = [];
+chosenlinescell4(cellfun(fh, chosenlinescell4)) = [];
+scorecelltube1(cellfun(fh, scorecelltube1)) = [];
+scorecelltube2(cellfun(fh, scorecelltube2)) = [];
+scorecelltube3(cellfun(fh, scorecelltube3)) = [];
+scorecelltube4(cellfun(fh, scorecelltube4)) = [];
+
 %Now we add all projected line "scores" and assocaite them with the coordinates of the four lines represented by the score . 
 %Let's initialize the home cell for all this great information.
 outputlinesandscores = cell(length(scorecelltube1)*length(scorecelltube2)*length(scorecelltube3)*length(scorecelltube4),2)
@@ -498,9 +508,10 @@ for k1 = 1:length(scorecelltube1);
             end 
         end 
     end 
-end 
+end
 
-outputlinesandscores;
+
+outputlinesandscores
 %outputlinesandscores is a cell with two columns. The second contains the
 %score associated with any four lines. The first contains the four lines in
 %the format [x1, y1; x2, y2]*4, for the four lines. The first two columns
