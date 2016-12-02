@@ -25,18 +25,17 @@ classdef segment < handle
         end 
         
         function percentageOverlap = findPercentageOverlap(S)
-            % Compute the percentage overlap 
             % Jaccard Index 
+            % Compute percentage overlap 
             percentageOverlap = zeros(size(S.hypothesisRegions));
             for i = 1:size(S.hypothesisRegions)
                 regionUnion = union(S.hypothesisRegions(i),S.segmentRegion);
                 regionIntersect = intersect(S.hypothesisRegions(i),S.segmentRegion);
-                % If overlap is complete, percentage should be 100 
-                % If sets are disjoint, percentage should be 0 
                 percentageOverlap(i) = size(regionIntersect)/size(regionUnion);
             end            
         end 
         function S = findHighScore(S, normalizedRatios, percentageOverlap)
+            % Find highest score for given list of hypotheses 
             meanScore = (S.hypothesisProbability + normalizedRatios + percentageOverlap)/3;
             S.highScore = max(meanScore);
         end
