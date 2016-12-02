@@ -12,24 +12,27 @@
 %Output is explained in comment at bottom of code.
 
 %VARIABLES TO TINKER WITH:
-tuberad = 0.15; %The radius of the tubes (also determines the parallel "height beyond lines"
+tuberad = 1.05; %The radius of the tubes (also determines the parallel "height beyond lines"
 mintheta = 15; %The value of degrees for which all relevant 'other' lines must be within relative to the 'hypothesis' line in question.
 
 %Generate sample hypotheses. We want 4. This is for the sake of testing
 %things.
 %Hypothesis:
-X1=[1,1.5];
-Y1=[1,7];
+imshow('test.jpg')
+X1=[20,20];
+Y1=[50,20];
 h1 = line(X1,Y1,'color','red');
-X2=[1.5,4];
-Y2=[7,7];
+X2=[20,50];
+Y2=[20,20];
 h2 = line(X2,Y2,'color','red');
-X3=[4,4];
-Y3=[1.5,7];
+X3=[50,50];
+Y3=[50,20];
 h3 = line(X3,Y3,'color','red');
-X4=[1,4];
-Y4=[1,1.5];
+X4=[20,50];
+Y4=[50,50];
 h4 = line(X4,Y4,'color','red');
+X5 = [21,51]
+Y5 = [20,49]
 
 %Other Lines:
 X100=[0.5,2];
@@ -67,7 +70,7 @@ plot(tx1,ty1,'.-','color','green')
 tx2 = [X2(1)-tuberad,X2(2)+tuberad,X2(2)+tuberad,X2(1)-tuberad,X2(1)-tuberad,X2(2)+tuberad];
 ty2 = [Y2(1)+tuberad,Y2(2)+tuberad,Y2(2)-tuberad,Y2(1)-tuberad,Y2(1)+tuberad,Y2(2)+tuberad];
 plot(tx2,ty2,'.-','color','green')
-%Tube 3: Right Side TUBULAR DUDE! (Top - Bot = pos)
+%Tube 3: Right Side TUBULAR DUDE! (Right - Left = pos)
 tx3 = [X3(1)+tuberad,X3(2)+tuberad,X3(2)-tuberad,X3(1)-tuberad,X3(1)+tuberad,X3(2)+tuberad];
 ty3 = [Y3(1)-tuberad,Y3(2)+tuberad,Y3(2)+tuberad,Y3(1)-tuberad,Y3(1)-tuberad,Y3(2)+tuberad];
 plot(tx3,ty3,'.-','color','green')
@@ -492,7 +495,7 @@ scorecelltube4(cellfun(fh, scorecelltube4)) = [];
 
 %Now we add all projected line "scores" and assocaite them with the coordinates of the four lines represented by the score . 
 %Let's initialize the home cell for all this great information.
-outputlinesandscores = cell(length(scorecelltube1)*length(scorecelltube2)*length(scorecelltube3)*length(scorecelltube4),2)
+outputlinesandscores = cell(length(scorecelltube1)*length(scorecelltube2)*length(scorecelltube3)*length(scorecelltube4),2);
 count = 0;
 for k1 = 1:length(scorecelltube1);
     for k2 = 1:length(scorecelltube2);
