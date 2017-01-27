@@ -1,4 +1,4 @@
-classdef segment < handle 
+classdef Segment < handle 
     properties 
         segmentRegion % set of x, y coordinates
         hypothesisRegions % list of set of x, y coordinates 
@@ -16,22 +16,22 @@ classdef segment < handle
         function normalizedRatios = findNormalizedRatio(S)
             % Compute the normalized ratio 
             normalizedRatios = zeros(size(S.hypothesisRegions));
-            for i = 1:size(S.hypothesisRegions)
-                regionDiff = setdiff(S.hypothesisRegions{i}, S.segmentRegion);
-                normalizedRatios(i) = 1 - size(regionDiff)/size(S.segmentRegion);
+            for i = 1:length(S.hypothesisRegions)
+                regionDiff = setdiff(S.segmentRegion, S.hypothesisRegions{i},'rows');
+                normalizedRatios(i) = 1 - size(regionDiff,1)/size(S.segmentRegion,1);
             end  
             % Normalize 
-            normalizedRatios = normalizedRatios/norm(normalizedRatios);
+             normalizedRatios = normalizedRatios/norm(normalizedRatios);
         end 
         
         function percentageOverlap = findPercentageOverlap(S)
             % Jaccard Index 
             % Compute percentage overlap 
             percentageOverlap = zeros(size(S.hypothesisRegions));
-            for i = 1:size(S.hypothesisRegions)
-                regionUnion = union(S.hypothesisRegions{i},S.segmentRegion);
-                regionIntersect = intersect(S.hypothesisRegions{i},S.segmentRegion);
-                percentageOverlap(i) = size(regionIntersect)/size(regionUnion);
+            for i = 1:length(S.hypothesisRegions)
+                regionUnion = union(S.hypothesisRegions{i},S.segmentRegion,'rows');
+                regionIntersect = intersect(S.hypothesisRegions{i},S.segmentRegion,'rows');
+                percentageOverlap(i) = size(regionIntersect,1)/size(regionUnion,1);
             end            
         end 
         function S = findHighScore(S, normalizedRatios, percentageOverlap)
