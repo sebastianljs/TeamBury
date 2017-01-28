@@ -4,6 +4,7 @@ classdef Segment < handle
         hypothesisRegions % list of set of x, y coordinates 
         hypothesisProbability % between 0 and 1 
         highScore % Highest score among hypothesisRegions 
+        bestHypothesis
     end 
     
     methods     
@@ -37,7 +38,9 @@ classdef Segment < handle
         function S = findHighScore(S, normalizedRatios, percentageOverlap)
             % Find highest score for given list of hypotheses 
             meanScore = (S.hypothesisProbability + normalizedRatios + percentageOverlap)/3;
-            S.highScore = max(meanScore);
+            [~, idx] = max(meanScore);
+            S.highScore = meanScore(idx);
+            S.bestHypothesis = S.hypothesisRegions(idx);
         end
     end 
 end 
