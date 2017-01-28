@@ -14,12 +14,10 @@
 tuberad = 3; %The magnitude of the vector from the end of a hypothesis to the corner of a tube. 
 mintheta = 15; %The value of degrees for which all relevant 'other' lines must be within relative to the 'hypothesis' line in question.
 
-
 %Generate sample hypotheses. We want 4. 
 %Hypothesis:
 %roofhyp{i,j}, where i is the hypothesis, and j is each line where 1<=j<=4
 %[x1,x2;y1,y2]
-crashcount = 0;
 finaloutput = cell(1,length(roofhypo));
 for khypo = 1:length(roofhypo)
     crashcount = crashcount + 1;
@@ -172,6 +170,9 @@ for khypo = 1:length(roofhypo)
     %with [x1,x2,y1,y2,width].' in every column.
     %THIS NEEDS TO BE OPTIMIZED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     %Integration one from joyce
+    input = load('testlines.mat'); %%Input files
+    lines = input.lines;
+    linelist = [];
     for k = 1:length(lines)
         x2 = lines(2,k);
         y1 = lines(3,k);
@@ -594,14 +595,14 @@ for khypo = 1:length(roofhypo)
                    outputlinesandscores{count, 1} = scoredlines;
                    outputlinesandscores{count, 2} = comboscore; 
 
-        finaloutput{1,khypo} = outputlinesandscores;
-                    
+    finaloutput{1,khypo} = outputlinesandscores;
+                
                 end 
             end 
         end 
     end
 end
-outputlinesandscores == finaloutput{1,1}
+
 
        %Should this be in the loop? Review code at some point. Maybe put in
        %a threshold parameter that things must be higher than in order to reduce
