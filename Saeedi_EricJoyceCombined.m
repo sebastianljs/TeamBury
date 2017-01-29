@@ -20,7 +20,6 @@ mintheta = 15; %The value of degrees for which all relevant 'other' lines must b
 %[x1,x2;y1,y2]
 finaloutput = cell(1,length(roofhypo));
 for khypo = 1:length(roofhypo)
-    crashcount = crashcount + 1;
     %imshow('Norfolk_01_training.tif');
     hyp1=[roofhypo{khypo,1}(1),roofhypo{khypo,1}(2);roofhypo{khypo,1}(3),roofhypo{khypo,1}(4)];
     hyp2=[roofhypo{khypo,2}(1),roofhypo{khypo,2}(2);roofhypo{khypo,2}(3),roofhypo{khypo,2}(4)];
@@ -37,7 +36,7 @@ for khypo = 1:length(roofhypo)
     %Now we're going to use the tube creator as defined below in order to
     %create tubes for all four lines of the hypotheses: hyp1,hyp2,hyp3,hyp4
 
-    for k = 1:length(hypotheses)
+    for k = 1:length(hypotheses); 
         hyp = hypotheses{1,k};
         %TUBE CREATOR: For a general line, creates a tube: (hyp1x=[x1,x2]=[a,c], hyp1y=[y1,y2]=[b,d], the first wall of hypothesis 1))
         x1 = hyp(1);
@@ -58,20 +57,20 @@ for khypo = 1:length(roofhypo)
         %In the case the vector is in the first quadrant, no transformation is
         %required.
         %Second Quadrant
-        if (y2-y1) > 0
-            if (x2-x1) < 0
+        if (y2-y1) > 0;
+            if (x2-x1) < 0;
                 thetadeg = thetadeg + 90;
             end
         end 
         %Third Quadrant
-        if (y2-y1) < 0
-            if (x2-x1) < 0
+        if (y2-y1) < 0;
+            if (x2-x1) < 0;
                 thetadeg = thetadeg + 180;
             end
         end 
         %Four Quadrant
-        if (y2-y1) < 0
-            if (x2-x1) > 0
+        if (y2-y1) < 0;
+            if (x2-x1) > 0;
                 thetadeg = thetadeg + 270;
             end
         end 
@@ -88,7 +87,7 @@ for khypo = 1:length(roofhypo)
         %around to the "base".
 
         %FOR THETA DICTATING HYPOTHESIS IS IN QUADRANTS 1 OR 3.
-        if (0 < thetadeg) && (thetadeg <= 90) || (180 < thetadeg) && (thetadeg <= 270)
+        if (0 < thetadeg) && (thetadeg <= 90) || (180 < thetadeg) && (thetadeg <= 270);
             %Transforming the coordinates for "vector 1": (x2,y2 are coords for the endpoint of
             %the hypoth vetor)
             v1x2cord = x2 + tuberad*cos((thetadeg+45)*pi/180);
@@ -113,7 +112,7 @@ for khypo = 1:length(roofhypo)
             v4y1cord = y1;
         end
         %FOR THETA DICTATING HYPOTHESIS IS IN QUADRANTS 2 OR 4.
-        if (90 < thetadeg) && (thetadeg <= 180) || (270 < thetadeg) && (thetadeg <= 360)
+        if (90 < thetadeg) && (thetadeg <= 180) || (270 < thetadeg) && (thetadeg <= 360);
             %Transforming the coordinates for "vector 1": (x2,y2 are coords for the endpoint of
             %the hypoth vetor)
             v1x2cord = x2 + tuberad*cos((-(thetadeg+135))*pi/180);
@@ -144,16 +143,16 @@ for khypo = 1:length(roofhypo)
         %End of TUBE CREATOR
         %Now we will put the boundary points of each rectangle for each hypoth
         %in its respective matrix. [x1,x2,x3,x4;y1,y2,y3,y4]
-        if k == 1
+        if k == 1;
             tube1 = [v1x2cord,v2x2cord,v3x2cord,v4x2cord;v1y2cord,v2y2cord,v3y2cord,v4y2cord];      
         end 
-        if k == 2
+        if k == 2;
             tube2 = [v1x2cord,v2x2cord,v3x2cord,v4x2cord;v1y2cord,v2y2cord,v3y2cord,v4y2cord]; 
         end 
-        if k == 3
+        if k == 3;
             tube3 = [v1x2cord,v2x2cord,v3x2cord,v4x2cord;v1y2cord,v2y2cord,v3y2cord,v4y2cord]; 
         end 
-        if k == 4
+        if k == 4;
             tube4 = [v1x2cord,v2x2cord,v3x2cord,v4x2cord;v1y2cord,v2y2cord,v3y2cord,v4y2cord]; 
         end 
     end
@@ -170,14 +169,6 @@ for khypo = 1:length(roofhypo)
     %with [x1,x2,y1,y2,width].' in every column.
     %THIS NEEDS TO BE OPTIMIZED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     %Integration one from joyce
-<<<<<<< HEAD
-    load('testlines.mat')
-    for k = 1:length(testlines)
-        x2 = testlines(2,k);
-        y1 = testlines(3,k);
-        x1 = testlines(1,k);
-        y2 = testlines(4,k);
-=======
     input = load('testlines.mat'); %%Input files
     lines = input.lines;
     linelist = [];
@@ -186,30 +177,29 @@ for khypo = 1:length(roofhypo)
         y1 = lines(3,k);
         x1 = lines(1,k);
         y2 = lines(4,k);
->>>>>>> c91c71bab47e03b6385880d10b6bc0e521567a1f
         linelist = [linelist, [x1,x2;y1,y2]];
     end 
     linecell = cell(length(linelist)/2,1);
-    for i = 1:(length(linelist)/2)
+    for i = 1:(length(linelist)/2);
         linecell{i,1} = linelist(4*i-3:4*i);
     end
     Tube1Array = [];
     Tube2Array = [];
     Tube3Array = [];
     Tube4Array = [];
-    for k = linelist
+    for k = linelist;
         [in] = inpolygon(k(1),k(2),tube1(1,:),tube1(2,:));
         Tube1Array = cat(1,Tube1Array,[in]);
     end
-    for k = linelist
+    for k = linelist;
         [in] = inpolygon(k(1),k(2),tube2(1,:),tube2(2,:));
         Tube2Array = cat(1,Tube2Array,[in]);
     end
-    for k = linelist
+    for k = linelist;
         [in] = inpolygon(k(1),k(2),tube3(1,:),tube3(2,:));
         Tube3Array = cat(1,Tube3Array,[in]);
     end
-    for k = linelist
+    for k = linelist;
         [in] = inpolygon(k(1),k(2),tube4(1,:),tube4(2,:));
         Tube4Array = cat(1,Tube4Array,[in]);
     end
@@ -220,14 +210,13 @@ for khypo = 1:length(roofhypo)
     Tube2Lines = mat2cell(Tube2Array,zeros(1,(size(Tube2Array,1)/2))+2,[1]);
     Tube3Lines = mat2cell(Tube3Array,zeros(1,(size(Tube3Array,1)/2))+2,[1]);
     Tube4Lines = mat2cell(Tube4Array,zeros(1,(size(Tube4Array,1)/2))+2,[1]);
-
-    %Now we will seperate any lines that "fit" (or one pt in the line is in the
+     %Now we will seperate any lines that "fit" (or one pt in the line is in the
     %polygon, to check for the entire line in polygon switch to [0;0] on all.)
     %The process will be carried out for each line one at a time from now on.
     %Tube 1:
     count = 0;
-    for k = 1:length(Tube1Lines)
-        if cell2mat(Tube1Lines(k)) == [1;1] %%%%%%
+    for k = 1:length(Tube1Lines);
+        if cell2mat(Tube1Lines(k)) == [1;1]; %%%%%%
             %counter variable to determine size of the chosen lines cell.
             count = count+1;
         end
@@ -235,8 +224,8 @@ for khypo = 1:length(roofhypo)
     end
     chosenlinescell = cell(count,1);
     count2 = 1;
-    for k = 1:length(Tube1Lines)
-        if cell2mat(Tube1Lines(k)) == [1;1]
+    for k = 1:length(Tube1Lines);
+        if cell2mat(Tube1Lines(k)) == [1;1];
             %select the matrices of lines information such that they are within
             %the tubes
             tubelinecoords = vec2mat(cell2mat(linecell(k)),2);
@@ -245,11 +234,12 @@ for khypo = 1:length(roofhypo)
         end
     end
 
-
+    
+   
     %STEP 3: Remove lines with an orientation difference from the side higher
     %than 15%
     %Remember hypothesis is hyp1
-    for k = 1:length(chosenlinescell)
+    for k = 1:length(chosenlinescell);
         hypothline = cell2mat(chosenlinescell(k));
         linepointA = hypothline(1:2);
         linepointB = hypothline(3:4); 
@@ -265,8 +255,8 @@ for khypo = 1:length(roofhypo)
         thetadeg = thetarads * (180/pi);
         %Now we have our angle in degrees.
         %Let's remove the vectors that are more than 15 degrees different
-        if thetadeg > mintheta
-            if thetadeg < 360-mintheta
+        if thetadeg > mintheta;
+            if thetadeg < 360-mintheta; 
             chosenlinescell{k,1} = NaN;  
             %Now anywhere this was true, the chosenlines cell contains NaN
             end 
@@ -276,8 +266,8 @@ for khypo = 1:length(roofhypo)
     %hypothesis," which based on how this code is written is already determined.
     projectorcell1 = chosenlinescell;
     scorecelltube1 = projectorcell1;
-    for k = 1:length(chosenlinescell)
-        if isnan(chosenlinescell{k}) == 0
+    for k = 1:length(chosenlinescell);
+        if isnan(chosenlinescell{k}) == 0;
             hypothline = cell2mat(chosenlinescell(k));
             linepointA = hypothline(1:2);
             linepointB = hypothline(3:4); 
@@ -292,7 +282,7 @@ for khypo = 1:length(roofhypo)
             projectorcell1{k} = projection;
             %STEP 5: Calculate normalized coverage due to line projection.
             normedcov = norm(projection)/norm(hypothvec);
-            if normedcov > 1
+            if normedcov > 1;
                 %Adjust for the fact some lines may be far beyond the boundary
                 %of our hypothesis and they don't deserve a higher score.
                 normedcov = normedcov^-1;
@@ -305,8 +295,8 @@ for khypo = 1:length(roofhypo)
 
     %TUBE 2
     count = 0;
-    for k = 1:length(Tube2Lines)
-        if cell2mat(Tube2Lines(k)) == [1;1]
+    for k = 1:length(Tube2Lines);
+        if cell2mat(Tube2Lines(k)) == [1;1]; 
             %counter variable to determine size of the chosen lines cell.
             count = count+1;
 
@@ -314,8 +304,8 @@ for khypo = 1:length(roofhypo)
     end
     chosenlinescell2 = cell(count,1);
     count2 = 1;
-    for k = 1:length(Tube2Lines)
-        if cell2mat(Tube2Lines(k)) == [1;1]
+    for k = 1:length(Tube2Lines);
+        if cell2mat(Tube2Lines(k)) == [1;1];
             %select the matrices of lines information such that they are within
             %the tubes
             tubelinecoords = vec2mat(cell2mat(linecell(k)),2);
@@ -330,7 +320,7 @@ for khypo = 1:length(roofhypo)
     %STEP 3: Remove lines with an orientation difference from the side higher
     %than 15%
     %Remember hypothesis is in hyp1. 
-    for k = 1:length(chosenlinescell2)
+    for k = 1:length(chosenlinescell2);
         hypothline = cell2mat(chosenlinescell2(k));
         linepointA = hypothline(1:2);
         linepointB = hypothline(3:4); 
@@ -346,8 +336,8 @@ for khypo = 1:length(roofhypo)
         thetadeg = thetarads * (180/pi);
         %Now we have our angle in degrees.
         %Let's remove the vectors that are more than 15 degrees different
-        if thetadeg > mintheta
-            if thetadeg < 360-mintheta
+        if thetadeg > mintheta;
+            if thetadeg < 360-mintheta; 
             chosenlinescell2{k,1} = NaN;  
             %Now anywhere this was true, the chosenlines cell contains NaN
             end 
@@ -357,14 +347,14 @@ for khypo = 1:length(roofhypo)
     %hypothesis," which based on how this code is written is already determined.
     projectorcell2 = chosenlinescell2;
     scorecelltube2 = projectorcell2;
-    for k = 1:length(chosenlinescell2)
-        if isnan(chosenlinescell2{k}) == 0
+    for k = 1:length(chosenlinescell2);
+        if isnan(chosenlinescell2{k}) == 0;
             hypothline = cell2mat(chosenlinescell2(k));
             linepointA = hypothline(1:2);
             linepointB = hypothline(3:4); 
             randlinevec = (linepointB - linepointA);
             x1y1 = [hyp2(1),hyp2(2)];
-            x2y2 = [hyp2(3),hyp2(4)];
+            x2y2 = [hyp2(3),hyp2(4)];;
             hypothvec = (x2y2-x1y1);
             %Project randlinevec onto hypothvec.
             projection =(dot(randlinevec,hypothvec)/norm(hypothvec)^2)*hypothvec;
@@ -373,7 +363,7 @@ for khypo = 1:length(roofhypo)
             projectorcell2{k} = projection;
             %STEP 5: Calculate normalized coverage due to line projection.
             normedcov = norm(projection)/norm(hypothvec);
-            if normedcov > 1
+            if normedcov > 1;
                 %Adjust for the fact some lines may be far beyond the boundary
                 %of our hypothesis and they don't deserve a higher score.
                 normedcov = normedcov^-1;
@@ -385,16 +375,16 @@ for khypo = 1:length(roofhypo)
     end 
     %TUBE 3
     count = 0;
-    for k = 1:length(Tube3Lines)
-        if cell2mat(Tube3Lines(k)) == [1;1] %COULDN'T GET "OR" "|" OPERATOR TO WORK!!!!!
+    for k = 1:length(Tube3Lines);
+        if cell2mat(Tube3Lines(k)) == [1;1]; %COULDN'T GET "OR" "|" OPERATOR TO WORK!!!!!
             %counter variable to determine size of the chosen lines cell.
             count = count+1;
         end
     end
     chosenlinescell3 = cell(count,1);
     count2 = 1;
-    for k = 1:length(Tube3Lines)
-        if cell2mat(Tube3Lines(k)) == [1;1]
+    for k = 1:length(Tube3Lines);
+        if cell2mat(Tube3Lines(k)) == [1;1];
             %select the matrices of lines information such that they are within
             %the tubes
             tubelinecoords = vec2mat(cell2mat(linecell(k)),2);
@@ -412,7 +402,7 @@ for khypo = 1:length(roofhypo)
     %STEP 3: Remove lines with an orientation difference from the side higher
     %than 15%
     %Remember hypothesis is in hyp1. 
-    for k = 1:length(chosenlinescell3)
+    for k = 1:length(chosenlinescell3);
         hypothline = cell2mat(chosenlinescell3(k));
         linepointA = hypothline(1:2);
         linepointB = hypothline(3:4); 
@@ -428,8 +418,8 @@ for khypo = 1:length(roofhypo)
         thetadeg = thetarads * (180/pi);
         %Now we have our angle in degrees.
         %Let's remove the vectors that are more than 15 degrees different
-        if thetadeg > mintheta
-            if thetadeg < 360-mintheta 
+        if thetadeg > mintheta;
+            if thetadeg < 360-mintheta; 
             chosenlinescell3{k,1} = NaN;  
             %Now anywhere this was true, the chosenlines cell contains NaN
             end 
@@ -439,8 +429,8 @@ for khypo = 1:length(roofhypo)
     %hypothesis," which based on how this code is written is already determined.
     projectorcell3 = chosenlinescell3;
     scorecelltube3 = projectorcell3;
-    for k = 1:length(chosenlinescell3)
-        if isnan(chosenlinescell3{k}) == 0
+    for k = 1:length(chosenlinescell3);
+        if isnan(chosenlinescell3{k}) == 0;
             hypothline = cell2mat(chosenlinescell3(k));
             linepointA = hypothline(1:2);
             linepointB = hypothline(3:4); 
@@ -455,7 +445,7 @@ for khypo = 1:length(roofhypo)
             projectorcell3{k} = projection;
             %STEP 5: Calculate normalized coverage due to line projection.
             normedcov = norm(projection)/norm(hypothvec);
-            if normedcov > 1
+            if normedcov > 1;
                 %Adjust for the fact some lines may be far beyond the boundary
                 %of our hypothesis and they don't deserve a higher score.
                 normedcov = normedcov^-1;
@@ -468,16 +458,16 @@ for khypo = 1:length(roofhypo)
 
     %Tube 4
     count = 0;
-    for k = 1:length(Tube4Lines)
-        if cell2mat(Tube4Lines(k)) == [1;1] %COULDN'T GET "OR" "|" OPERATOR TO WORK!!!!!
+    for k = 1:length(Tube4Lines);
+        if cell2mat(Tube4Lines(k)) == [1;1]; %COULDN'T GET "OR" "|" OPERATOR TO WORK!!!!!
             %counter variable to determine size of the chosen lines cell.
             count = count+1;
         end
     end
     chosenlinescell4 = cell(count,1);
     count2 = 1;
-    for k = 1:length(Tube4Lines)
-        if cell2mat(Tube4Lines(k)) == [1;1]
+    for k = 1:length(Tube4Lines);
+        if cell2mat(Tube4Lines(k)) == [1;1];
             %select the matrices of lines information such that they are within
             %the tubes
             tubelinecoords = vec2mat(cell2mat(linecell(k)),2);
@@ -495,7 +485,7 @@ for khypo = 1:length(roofhypo)
     %STEP 3: Remove lines with an orientation difference from the side higher
     %than 15%
     %Remember hypothesis is in hyp 1. 
-    for k = 1:length(chosenlinescell4)
+    for k = 1:length(chosenlinescell4);
         hypothline = cell2mat(chosenlinescell4(k));
         linepointA = hypothline(1:2);
         linepointB = hypothline(3:4); 
@@ -511,8 +501,8 @@ for khypo = 1:length(roofhypo)
         thetadeg = thetarads * (180/pi);
         %Now we have our angle in degrees.
         %Let's remove the vectors that are more than 15 degrees different
-        if thetadeg > mintheta
-            if thetadeg < 360-mintheta
+        if thetadeg > mintheta;
+            if thetadeg < 360-mintheta; 
             chosenlinescell4{k,1} = NaN;  
             %Now anywhere this was true, the chosenlines cell contains NaN
             end 
@@ -522,8 +512,8 @@ for khypo = 1:length(roofhypo)
     %hypothesis," which based on how this code is written is already determined.
     projectorcell4 = chosenlinescell4;
     scorecelltube4 = projectorcell4;
-    for k = 1:length(chosenlinescell4)
-        if isnan(chosenlinescell4{k}) == 0
+    for k = 1:length(chosenlinescell4);
+        if isnan(chosenlinescell4{k}) == 0;
             hypothline = cell2mat(chosenlinescell4(k));
             linepointA = hypothline(1:2);
             linepointB = hypothline(3:4); 
@@ -538,7 +528,7 @@ for khypo = 1:length(roofhypo)
             projectorcell4{k} = projection;
             %STEP 5: Calculate normalized coverage due to line projection.
             normedcov = norm(projection)/norm(hypothvec);
-            if normedcov > 1
+            if normedcov > 1;
                 %Adjust for the fact some lines may be far beyond the boundary
                 %of our hypothesis and they don't deserve a higher score.
                 normedcov = normedcov^-1;
@@ -556,22 +546,21 @@ for khypo = 1:length(roofhypo)
 
     %First, filter out those scorecellN's with no results.
 
-    if isempty(cell2mat(scorecelltube1)) == 1
+    if isempty(cell2mat(scorecelltube1)) == 1;
         scorecelltube1 = cell(1);
     end 
-    if isempty(cell2mat(scorecelltube2)) == 1
+    if isempty(cell2mat(scorecelltube2)) == 1;
         scorecelltube2 = cell(1);
     end 
-    if isempty(cell2mat(scorecelltube3)) == 1
+    if isempty(cell2mat(scorecelltube3)) == 1;
         scorecelltube3 = cell(1);
     end 
-    if isempty(cell2mat(scorecelltube4)) == 1
+    if isempty(cell2mat(scorecelltube4)) == 1;
         scorecelltube4 = cell(1);
     end 
     %add the original hypoth lines to the end of cell of things being
     %looped through in calculting score. add 'perfect score' to list of scores.
     %Remember: things in chosenlinescell are now in [x1,y1;x2,y2]
-
     chosenlinescell{(length(chosenlinescell)+1),1} = [hyp1(1),hyp1(2);hyp1(3),hyp1(4)];
     chosenlinescell2{(length(chosenlinescell2)+1),1} = [hyp2(1),hyp2(2);hyp2(3),hyp2(4)];
     chosenlinescell3{(length(chosenlinescell3)+1),1} = [hyp3(1),hyp3(2);hyp3(3),hyp3(4)];
@@ -594,10 +583,10 @@ for khypo = 1:length(roofhypo)
     %Let's initialize the home cell for all this great information.
     outputlinesandscores = cell(length(scorecelltube1)*length(scorecelltube2)*length(scorecelltube3)*length(scorecelltube4),2);
     count = 0;
-    for k1 = 1:length(scorecelltube1)
-        for k2 = 1:length(scorecelltube2)
-            for k3 = 1:length(scorecelltube3)
-                for k4 = 1:length(scorecelltube4)
+    for k1 = 1:length(scorecelltube1);
+        for k2 = 1:length(scorecelltube2);
+            for k3 = 1:length(scorecelltube3);
+                for k4 = 1:length(scorecelltube4);
                    count = count + 1;
                    comboscore = scorecelltube1{k1} + scorecelltube2{k2} + scorecelltube3{k3} + scorecelltube4{k4}; 
                    scoredlines = [chosenlinescell{k1}, chosenlinescell2{k2}, chosenlinescell3{k3}, chosenlinescell4{k4}];
@@ -605,23 +594,25 @@ for khypo = 1:length(roofhypo)
                    outputlinesandscores{count, 2} = comboscore; 
 
     finaloutput{1,khypo} = outputlinesandscores;
-                
+    
                 end 
             end 
         end 
     end
 end
+%outputlinesandscores is an ix2 cell such that every row first column contains a 2x8
+%matrix, representing a hypothesis of four lines, and every row second
+%column contains the score assigned to that particular hypothesis. There
+%are as many rows as there are potential hypotheses that have made it past
+%the filtering procedure. finaloutput is a 1xn cell where n is the total
+%number of hypotheses iterated over. Each column contians
+%outputlinesandscores for the given hypothesis. 
 
-
-       %Should this be in the loop? Review code at some point. Maybe put in
-       %a threshold parameter that things must be higher than in order to reduce
-       %number of final outputs?
-
-%outputlinesandscores is a cell with two columns. The second contains the
+%More on outputlinesandscores:
+%outputlinesandscores is a cell with two rows. The second contains the
 %score associated with any four lines. The first contains the four lines in
 %the format [x1, y1; x2, y2]*4, for the four lines. The first two columns
 %within this column of outputlinesandscores belong to the first line, and so on. 
 
 
-%Also do part D for monday 
 
