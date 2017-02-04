@@ -11,11 +11,23 @@
 
 
 %VARIABLES TO TINKER WITH:
-tuberad = 3; %The magnitude of the vector from the end of a hypothesis to the corner of a tube. 
-mintheta = 15; %The value of degrees for which all relevant 'other' lines must be within relative to the 'hypothesis' line in question.
+tuberad = 4; %The magnitude of the vector from the end of a hypothesis to the corner of a tube. 
+mintheta = 30; %The value of degrees for which all relevant 'other' lines must be within relative to the 'hypothesis' line in question.
+avgthresh = 1.2; 
+medthresh = 1.2; 
+stdthresh = 1.2; 
 
-%Generate sample hypotheses. We want 4. 
+
 %Hypothesis:
+%roofhypo{i,j}, where i is the hypothesis, and j is each line where 1<=j<=4
+%[x1,x2;y1,y2]
+%Open by performing Green/Blue Detection on the areas within the rooftop
+%hypotheses. 
+RGB = imread('Norfolk_01_training.tif');
+%Convert to double so we don't end up with int values only. (This is not a
+%binary problem)
+RGBdouble = double(RGB);
+number = 0;
 %roofhyp{i,j}, where i is the hypothesis, and j is each line where 1<=j<=4
 %[x1,x2;y1,y2]
 finaloutput = cell(1,length(roofhypo));
@@ -25,7 +37,90 @@ for khypo = 1:length(roofhypo)
     hyp2=[roofhypo{khypo,2}(1),roofhypo{khypo,2}(2);roofhypo{khypo,2}(3),roofhypo{khypo,2}(4)];
     hyp3=[roofhypo{khypo,3}(1),roofhypo{khypo,3}(2);roofhypo{khypo,3}(3),roofhypo{khypo,3}(4)];
     hyp4=[roofhypo{khypo,4}(1),roofhypo{khypo,4}(2);roofhypo{khypo,4}(3),roofhypo{khypo,4}(4)];
-    line([roofhypo{khypo,1}(1),roofhypo{khypo,1}(2)],[roofhypo{khypo,1}(3),roofhypo{khypo,1}(4)], 'color', 'red', 'LineWidth', 1)
+%     line([roofhypo{khypo,1}(1),roofhypo{khypo,1}(2)],[roofhypo{khypo,1}(3),roofhypo{khypo,1}(4)], 'color', 'red', 'LineWidth', 1)
+%     hold on
+%     line([roofhypo{khypo,2}(1),roofhypo{khypo,2}(2)],[roofhypo{khypo,2}(3),roofhypo{khypo,2}(4)], 'color', 'red', 'LineWidth', 1)
+%     hold on
+%     line([roofhypo{khypo,3}(1),roofhypo{khypo,3}(2)],[roofhypo{khypo,3}(3),roofhypo{khypo,3}(4)], 'color', 'red', 'LineWidth', 1)
+%     hold on
+%     line([roofhypo{khypo,4}(1),roofhypo{khypo,4}(2)],[roofhypo{khypo,4}(3),roofhypo{khypo,4}(4)], 'color', 'red', 'LineWidth', 1)
+%     hold on
+    %STEP 0: GREEN BLUE DETECTION STEP:
+    %Because we don't have actual rectangles we're going to choose the
+    %smallest-large rectangle that encompasses all points. 
+    maxx = max([roofhypo{khypo,1}(1),roofhypo{khypo,1}(2),roofhypo{khypo,2}(1),roofhypo{khypo,2}(2),roofhypo{khypo,3}(1),roofhypo{khypo,3}(2),roofhypo{khypo,4}(1),roofhypo{khypo,4}(2)]);
+    minx = min([roofhypo{khypo,1}(1),roofhypo{khypo,1}(2),roofhypo{khypo,2}(1),roofhypo{khypo,2}(2),roofhypo{khypo,3}(1),roofhypo{khypo,3}(2),roofhypo{khypo,4}(1),roofhypo{khypo,4}(2)]);
+    maxy = max([roofhypo{khypo,1}(3),roofhypo{khypo,1}(4),roofhypo{khypo,2}(3),roofhypo{khypo,2}(4),roofhypo{khypo,3}(3),roofhypo{khypo,3}(4),roofhypo{khypo,4}(3),roofhypo{khypo,4}(4)]);
+    miny = min([roofhypo{khypo,1}(3),roofhypo{khypo,1}(4),roofhypo{khypo,2}(3),roofhypo{khypo,2}(4),roofhypo{khypo,3}(3),roofhypo{khypo,3}(4),roofhypo{khypo,4}(3),roofhypo{khypo,4}(4)]);
+    outerpoint1 = [maxx,maxy];
+    outerpoint2 = [minx,miny];
+    outerpoint3 = [maxx,miny];
+    outerpoint4 = [minx,maxy];
+    polyx = [minx,maxx,maxx,minx];
+    polyy = [maxy,maxy,miny,miny]; 
+    greenratios = [];
+    blueratios = []; 
+    %We've chosen to blue ratio and green ratio independently, only because if
+    %we combine them in some way (as in GBRatio1) we would lose some important
+    %information
+    %**Ratio Computation
+    %BlueGreenRatio = (RGBdouble(:,:,2) + RGBdouble(:,:,3))./(RGBdouble(:,:,1));
+    BlueRatio = (RGBdouble(:,:,3)./(RGBdouble(:,:,1)));
+    GreenRatio = (RGBdouble(:,:,2)./(RGBdouble(:,:,1)));
+    for i = 1:size(BlueRatio,1); %%Rename if changing metric
+        for j = 1:size(BlueRatio,2); %%Rename if changing metric 
+            [in] = inpolygon(i,j,polyx,polyy);
+            %Check to see if the region we're looking at is within a given hyp.
+            if [in] == 1;
+                greenratios = [greenratios, GreenRatio(i,j)];
+                blueratios = [blueratios, BlueRatio(i,j)];
+            end 
+        end 
+    end
+    %Now we have two lists, one of the list of green ratios (G/R) for each pixel and one of the list of blue ratios (B/R)
+    %for each pixel. The computation of the ratio can easily be altered in the
+    %computation section marked ** if another metric is deemd more appropriate.
+
+    %Now, for each color we compute some metric representative of the larger segment from which the points 
+    %come that can be subject to thresholding. In this example we will use the
+    %independent blue and green data as calculated above: 
+    %greenratios and blueratios
+
+    %avg
+    avggreenR = mean(greenratios); 
+    avgblueR = mean(blueratios);
+    %median
+    medgreenR = median(greenratios);
+    medblueR = median(blueratios);
+    %stdev--produces interesting results :o
+    stdgreenR = std(greenratios);
+    stdblueR = median(blueratios); 
+
+    %PARAMETERS TO PLAY WITH
+    %Threshold...need to discuss/test for appropriate values. 
+
+
+    %We currently use the 'median' metric, as it's not sensitive to outliers, and seems to describe the 
+    %hypothesis decently well. However, others can be tried. 
+    val = 1;
+    if medgreenR > medthresh;
+         val = 0;   
+    if medblueR > medthresh;
+        val = 0;
+    end 
+    end
+    if val == 0; 
+        roofhypo(kyhpo) = NaN; %Replace the entry in roofhypo with NaN.
+    end
+        
+    %Returns 0 if the value  exceeds the threshold and thus the segmented
+    %region has enough green or blue to be considered invalid automatically. 
+    %otherwise returns 1. 
+    number = number + 1
+    
+    
+    
+    
     %STEP 1: Tube Creation. Tube is in green. Want a tube for every line in
     %hypothesis. Each hypothesis hyp1 etc is of form [x1,x2;y1,y2].
     hypotheses = cell(1,4);
@@ -136,10 +231,10 @@ for khypo = 1:length(roofhypo)
             v4x1cord = x1;
             v4y1cord = y1;
         end 
-        line([v1x2cord,v2x2cord],[v1y2cord,v2y2cord], 'color', 'green', 'LineWidth', 2)
-        line([v2x2cord,v3x2cord],[v2y2cord,v3y2cord], 'color', 'green', 'LineWidth', 2)
-        line([v3x2cord,v4x2cord],[v3y2cord,v4y2cord], 'color', 'green', 'LineWidth', 2)
-        line([v4x2cord,v1x2cord],[v4y2cord,v1y2cord], 'color', 'green', 'LineWidth', 2)
+%         line([v1x2cord,v2x2cord],[v1y2cord,v2y2cord], 'color', 'green', 'LineWidth', 2)
+%         line([v2x2cord,v3x2cord],[v2y2cord,v3y2cord], 'color', 'green', 'LineWidth', 2)
+%         line([v3x2cord,v4x2cord],[v3y2cord,v4y2cord], 'color', 'green', 'LineWidth', 2)
+%         line([v4x2cord,v1x2cord],[v4y2cord,v1y2cord], 'color', 'green', 'LineWidth', 2)
         %End of TUBE CREATOR
         %Now we will put the boundary points of each rectangle for each hypoth
         %in its respective matrix. [x1,x2,x3,x4;y1,y2,y3,y4]
