@@ -67,16 +67,14 @@ for khypo = 1:length(roofhypo)
     %BlueGreenRatio = (RGBdouble(:,:,2) + RGBdouble(:,:,3))./(RGBdouble(:,:,1));
     BlueRatio = (RGBdouble(:,:,3)./(RGBdouble(:,:,1)));
     GreenRatio = (RGBdouble(:,:,2)./(RGBdouble(:,:,1)));
-    for i = 1:size(BlueRatio,1); %%Rename if changing metric
-        for j = 1:size(BlueRatio,2); %%Rename if changing metric 
-            [in] = inpolygon(i,j,polyx,polyy);
-            %Check to see if the region we're looking at is within a given hyp.
-            if [in] == 1;
-                greenratios = [greenratios, GreenRatio(i,j)];
-                blueratios = [blueratios, BlueRatio(i,j)];
-            end 
+    for i = floor(minx):ceil(maxx); %%Rename if changing metric
+        for j = floor(miny):ceil(maxy); %%Rename if changing metric 
+            greenratios = [greenratios, GreenRatio(i,j)];
+            blueratios = [blueratios, BlueRatio(i,j)];
+             
         end 
     end
+    
     %Now we have two lists, one of the list of green ratios (G/R) for each pixel and one of the list of blue ratios (B/R)
     %for each pixel. The computation of the ratio can easily be altered in the
     %computation section marked ** if another metric is deemd more appropriate.
