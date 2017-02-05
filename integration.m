@@ -1,8 +1,16 @@
 load('SaeediEricJoyceWorkspace.mat')
-testImage = imread('test1.png');
-% Flatten testImage
+test1Segments = generateSegments('test1.png');
+test2Segments = generateSegments('test2.png');
+test3Segments = generateSegments('test3.png');
+test4Segments = generateSegments('test4.png');
+
+function segments = generateSegments(image)
+testImage = imread(image);
+%% Flatten testImage
 testImage = rgb2gray(testImage);
 imageVec = testImage(:);
+
+%% Find points in each segment
 % Find unique values in imageVec
 % Each segment is represented by a unique numerical value
 uniqVal = unique(imageVec);
@@ -18,62 +26,54 @@ for i=1:length(uniqVal)
     segments{i} = Segment;
     segments{i}.segmentRegion = [row, col];
 end
-% A hypothesis is two pairs of parallel lines perpendicular to each other
-% Allocate edges coordinates
-% xv are the x coordinates of vertices
-% yv are the y coordinates of vertices
-xv = zeros(1,4);
-yv = zeros(1,4);
-% Create a list of coordinates
+%% Create a list of coordinates
 [x, y] = meshgrid(1:imageHeight, 1:imageWidth);
 points = [x(:), y(:)];
 xAll = points(:,1);
 yAll = points(:,2);
-% Get edges coordinates
-% Loop through hypotheses
-% for i=1:length(finaloutput)
-%     edgesCoord = finaloutput{i}{1};
-%     for j = 1:4
-%         xv(j) = edgesCoord(1, 2*j-1);
-%         yv(j) = edgesCoord(2, 2*j-1);
-%     end
-%     hypoProb = finaloutput{i}{2};
-%     % Loop through segments
-%     for j = 1:length(segments)
-%         cSegment = segments{j};
-%         xq = cSegment.segmentRegion(:,1);
-%         yq = cSegment.segmentRegion(:,2);
-%         [in, ~] = inpolygon(xq, yq, xv', yv');
-%         xIn = xq(in);
-%         yIn = yq(in);
-%         ind = ismember(xq, xIn) & ismember(yq, yIn);
-%         % Find all points in polygon
-%         pointsIn = cSegment.segmentRegion(ind,:);
-%         if(isempty(pointsIn)==false)
-%             cSegment.hypothesisRegions = {cSegment.hypothesisRegions; pointsIn};
-%         end
-%     end
-% end
 
-edgesCoord = cell(1,length(finaloutput));
-hypoProb = zeros(1,length(finaloutput));
-for i=1:length(finaloutput)
-    edgesCoord{i} = finaloutput{i}{1,1};
-    hypoProb(i) = finaloutput{i}{1,2};
+%% Reshape finaloutput so that it becomes a list of 1x2 cells
+
+finaloutputCopy = finaloutput;
+numHypo = 0;
+% Indicates where each entry of the finaloutput starts
+startIndex = zeros(1,length(finaloutputCopy));
+for i = 1:length(finaloutputCopy)
+    numHypo = numHypo + size(finaloutputCopy{i},1);
+    startIndex(i) = numHypo;
 end
 
+% hypoList is a list of 1x2 cells
+hypoList = cell(1, numHypo);
+
+for i=startIndex
+    for j=1:length(finaloutputCopy)
+        cCell = finaloutputCopy{j};
+        for k = 1:size(cCell,1)
+            hypoList{i+k-1} = cCell(k,:);
+        end
+    end
+end
+%% Get edges coordinates
+edgesCoord = cell(1,length(hypoList));
+hypoProb = zeros(1,length(hypoList));
+for i=1:length(hypoList)
+    edgesCoord{i} = hypoList{i}{1,1};
+    hypoProb(i) = hypoList{i}{1,2};
+end
+%% Determine the hypotheses that overlaps with each segment
 for i = 1:length(segments)
     cSegment = segments{i};
     xq = cSegment.segmentRegion(:,1);
     yq = cSegment.segmentRegion(:,2);
     % Keep track of whether segment overlaps with hypothesis
-    hasOverlap = zeros(1,length(finaloutput));
+    hasOverlap = zeros(1,length(hypoList));
     cHypoX = zeros(1,4);
     cHypoY = zeros(1,4);
-    for j = 1:length(finaloutput)
+    for j = 1:length(hypoList)
         for k = 1:4
             % Find vertices of the hypotheses
-            cHypoX(k) = edgesCoord{j}(1,2*k-1); % Problem is edgesCoord
+            cHypoX(k) = edgesCoord{j}(1,2*k-1);
             cHypoY(k) = edgesCoord{j}(2,2*k-1);
         end
         % Find all points that overlaps with hypothesis
@@ -84,61 +84,34 @@ for i = 1:length(segments)
         % Overlapping region
         overlap = cSegment.segmentRegion(ind,:);
         if(isempty(overlap)==false)
-            hasOverlap(j) = 1;
+            hasOverlap(j) = 1; 
         end
     end
-       
+    % Return indices of hypotheses that overlaps with the segment
     ind = find(hasOverlap);
-    if(isempty(ind)==false)
-        overlappingHypo = edgesCoord(ind);
-        % TODO: Find the coordinates contained within each Hypo
-        overlappingHypoRegions = cell(1, length(overlappingHypo));
-        
-        for j = 1:length(overlappingHypo)
-            xv = overlappingHypo{j}(1,[1,3,5,7]);
-            yv = overlappingHypo{j}(2,[1,3,5,7]);
-            [in, on] = inpolygon(xAll, yAll,xv',yv');
-            xIn = xAll(in);
-            yIn = yAll(in);
-            inRegion = ismember(xAll, xIn) & ismember(yAll, yIn);
-            pointsIn = points(inRegion,:);
-            overlappingHypoRegions{j} = pointsIn;          
-        end        
-        cSegment.hypothesisRegions = overlappingHypoRegions;
-        overlappingHypoProb = hypoProb(ind);
-        cSegment.hypothesisProbability = overlappingHypoProb;
-        % Compute the ratios
-        normalizedRatios = findNormalizedRatio(cSegment);
-        percentageOverlap = findPercentageOverlap(cSegment);
-        highScore = findHighScore(cSegment, normalizedRatios, percentageOverlap);
-        cSegment.highScore = highScore;
+    overlappingHypo = edgesCoord(ind);
+    %% Find the coordinates contained within each Hypo
+    overlappingHypoRegions = cell(1, length(overlappingHypo));
+    
+    for j = 1:length(overlappingHypo)
+        xv = overlappingHypo{j}(1,[1,3,5,7]);
+        yv = overlappingHypo{j}(2,[1,3,5,7]);
+        [in, ~] = inpolygon(xAll, yAll,xv',yv');
+        xIn = xAll(in);
+        yIn = yAll(in);
+        inRegion = ismember(xAll, xIn) & ismember(yAll, yIn);
+        pointsIn = points(inRegion,:);
+        overlappingHypoRegions{j} = pointsIn;
     end
-    
-    
+    cSegment.hypothesisRegions = overlappingHypoRegions;
+    overlappingHypoProb = hypoProb(ind);
+    cSegment.hypothesisProbability = overlappingHypoProb;
+    %% Compute the ratios
+    normalizedRatios = findNormalizedRatio(cSegment);
+    percentageOverlap = findPercentageOverlap(cSegment);
+    highScore = findHighScore(cSegment, normalizedRatios, percentageOverlap);
+    cSegment.highScore = highScore;
 end
-% Get vertices in each polygon
-% Find all x's and y's in polygon
-% [in, on] = inpolygon(xq, yq, xv', yv');
-% xIn = xq(in); % Set of x's in polygon
-% yIn = yq(in); % Set of y's in polygon
-% % Find all points in polygon
-% % A point is in the polygon if both its x and y are in polygon
-% ind = ismember(points(:,1),xIn) & ismember(points(:,2),yIn);
-% pointsIn = points(ind,:); % Set of points in polygon
-% % Create a list of hypothesis
-% h1 = pointsIn;
-% h2 = pointsIn(1:floor(length(pointsIn)/2),:);
-% h3 = pointsIn(1:floor(length(pointsIn)/3),:);
-% hypothesisRegions = {h1, h2, h3};
-% segmentRegion = pointsIn;
-% hypothesisProbability = ones(1,length(hypothesisRegions));
-%
 
-% Create segment and compute the ratios
-% mySegment = Segment;
-% mySegment.segmentRegion = segmentRegion;
-% mySegment.hypothesisRegions = hypothesisRegions;
-% mySegment.hypothesisProbability = hypothesisProbability;
-% normalizedRatios = findNormalizedRatio(mySegment);
-% percentageOverlap = findPercentageOverlap(mySegment);
-% mySegment = findHighScore(mySegment, normalizedRatios, percentageOverlap);
+end
+
