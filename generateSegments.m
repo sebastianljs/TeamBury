@@ -1,15 +1,9 @@
-load('SaeediEricJoyceWorkspace.mat')
-test1Segments = generateSegments('test1.png');
-test2Segments = generateSegments('test2.png');
-test3Segments = generateSegments('test3.png');
-test4Segments = generateSegments('test4.png');
-
-function segments = generateSegments(image)
+function segments = generateSegments(image,finaloutput)
 testImage = imread(image);
 %% Flatten testImage
 testImage = rgb2gray(testImage);
 imageVec = testImage(:);
-
+disp('loading image ... done')
 %% Find points in each segment
 % Find unique values in imageVec
 % Each segment is represented by a unique numerical value
@@ -26,27 +20,35 @@ for i=1:length(uniqVal)
     segments{i} = Segment;
     segments{i}.segmentRegion = [row, col];
 end
+disp('Getting segment regions ... done')
 %% Create a list of coordinates
 [x, y] = meshgrid(1:imageHeight, 1:imageWidth);
 points = [x(:), y(:)];
 xAll = points(:,1);
 yAll = points(:,2);
-
 %% Reshape finaloutput so that it becomes a list of 1x2 cells
 
 finaloutputCopy = finaloutput;
 numHypo = 0;
 % Indicates where each entry of the finaloutput starts
 startIndex = zeros(1,length(finaloutputCopy));
+numHypo = 0; 
 for i = 1:length(finaloutputCopy)
     numHypo = numHypo + size(finaloutputCopy{i},1);
     startIndex(i) = numHypo;
 end
 
+disp('Getting start index ... done')
+disp('Number of hypotheses')
+disp(numHypo)
 % hypoList is a list of 1x2 cells
 hypoList = cell(1, numHypo);
 
 for i=startIndex
+     if(mod(i,30)==0)
+        outputString = sprintf('Generating hypoList for %d th segment',i);
+        disp(outputString)
+    end
     for j=1:length(finaloutputCopy)
         cCell = finaloutputCopy{j};
         for k = 1:size(cCell,1)
@@ -54,6 +56,8 @@ for i=startIndex
         end
     end
 end
+
+disp('Generating hypothesis list ... done')
 %% Get edges coordinates
 edgesCoord = cell(1,length(hypoList));
 hypoProb = zeros(1,length(hypoList));
@@ -61,8 +65,13 @@ for i=1:length(hypoList)
     edgesCoord{i} = hypoList{i}{1,1};
     hypoProb(i) = hypoList{i}{1,2};
 end
+disp('Getting list coordinates ... done')
 %% Determine the hypotheses that overlaps with each segment
 for i = 1:length(segments)
+    if(mod(i,30)==0)
+        outputString = sprintf('Calculating %d th segment',i);
+        disp(outputString)
+    end
     cSegment = segments{i};
     xq = cSegment.segmentRegion(:,1);
     yq = cSegment.segmentRegion(:,2);
@@ -71,6 +80,10 @@ for i = 1:length(segments)
     cHypoX = zeros(1,4);
     cHypoY = zeros(1,4);
     for j = 1:length(hypoList)
+        if(mod(j,100) == 0)
+            outputString = sprintf('Calculating %d th hypo',j);
+            disp(outputString)
+        end
         for k = 1:4
             % Find vertices of the hypotheses
             cHypoX(k) = edgesCoord{j}(1,2*k-1);
@@ -90,10 +103,19 @@ for i = 1:length(segments)
     % Return indices of hypotheses that overlaps with the segment
     ind = find(hasOverlap);
     overlappingHypo = edgesCoord(ind);
+    cSegment.hypothesisEdges = overlappingHypo;
+    if(mod(i,30)==0)
+        outputString = sprintf('Setting edges for %d th segment ... done',i);
+        disp(outputString)
+    end
     %% Find the coordinates contained within each Hypo
     overlappingHypoRegions = cell(1, length(overlappingHypo));
     
     for j = 1:length(overlappingHypo)
+        if(mod(j,30) == 0)
+            outputString = sprintf('Calculating %d th overlapping hypo',j);
+            disp(outputString)
+        end
         xv = overlappingHypo{j}(1,[1,3,5,7]);
         yv = overlappingHypo{j}(2,[1,3,5,7]);
         [in, ~] = inpolygon(xAll, yAll,xv',yv');
@@ -103,14 +125,23 @@ for i = 1:length(segments)
         pointsIn = points(inRegion,:);
         overlappingHypoRegions{j} = pointsIn;
     end
+    if(mod(i,30)==0)
+        outputString = sprintf('Calculating ratio for %d th segment',i);
+        disp(outputString)
+    end
     cSegment.hypothesisRegions = overlappingHypoRegions;
     overlappingHypoProb = hypoProb(ind);
     cSegment.hypothesisProbability = overlappingHypoProb;
     %% Compute the ratios
     normalizedRatios = findNormalizedRatio(cSegment);
     percentageOverlap = findPercentageOverlap(cSegment);
-    highScore = findHighScore(cSegment, normalizedRatios, percentageOverlap);
+    [bestHypothesis, highScore] = findHighScore(cSegment, normalizedRatios, percentageOverlap);
+    cSegment.bestHypothesis = bestHypothesis;
     cSegment.highScore = highScore;
+     if(mod(i,30)==0)
+        outputString = sprintf('Calculating ratio for %d th segment ... done',i);
+        disp(outputString)
+    end
 end
 
 end

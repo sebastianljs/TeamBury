@@ -1,9 +1,11 @@
 classdef Segment < handle 
     properties 
         segmentRegion % set of x, y coordinates
-        hypothesisRegions % list of set of x, y coordinates 
+        hypothesisEdges % list of sets of 4 edges that forms the hypothesis
+        hypothesisRegions % list of set of x, y coordinates in each hypothesis
         hypothesisProbability % between 0 and 4
-        highScore % Highest score among hypothesisRegions 
+        highScore % Highest score among hypothesisRegions
+        bestHypothesis % Hypothesis with the highest score 
     end 
     
     methods     
@@ -34,11 +36,12 @@ classdef Segment < handle
                 percentageOverlap(i) = size(regionIntersect,1)/size(regionUnion,1);
             end            
         end 
-        function highScore = findHighScore(S, normalizedRatios, percentageOverlap)
+        function [bestHypothesis, highScore] = findHighScore(S, normalizedRatios, percentageOverlap)
             % Find highest score for given list of hypotheses 
             meanScore = (S.hypothesisProbability + normalizedRatios + percentageOverlap)/3;
             [~, idx] = max(meanScore);
             highScore = meanScore(idx);
+            bestHypothesis = S.hypothesisEdges(idx);
         end
     end 
 end 
