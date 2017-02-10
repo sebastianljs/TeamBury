@@ -5,7 +5,7 @@ testImage = rgb2gray(testImage);
 imageVec = testImage(:);
 disp('loading image ... done')
 %% Find points in each segment
-% Find unique values in imageVec
+% Find unique values in imageVec 
 % Each segment is represented by a unique numerical value
 uniqVal = unique(imageVec);
 segments = cell(1,length(uniqVal));
