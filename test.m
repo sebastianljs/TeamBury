@@ -17,24 +17,26 @@
 % end 
 
 % Test function 
-finaloutputCopy = finaloutput;
-numHypo = 0; 
-% Indicates where each entry of the finaloutput starts 
-startIndex = zeros(1,length(finaloutputCopy));
-for i = 1:length(finaloutputCopy)
-    numHypo = numHypo + size(finaloutputCopy{i},1);  
-    startIndex(i) = numHypo;
-end 
-hypoList = cell(1, numHypo); 
+% finaloutputCopy = finaloutput;
+% numHypo = 0; 
+% % Indicates where each entry of the finaloutput starts 
+% startIndex = zeros(1,length(finaloutputCopy));
+% for i = 1:length(finaloutputCopy)
+%     numHypo = numHypo + size(finaloutputCopy{i},1);  
+%     startIndex(i) = numHypo;
+% end 
+% hypoList = cell(1, numHypo); 
+% 
+% % Use startindex might work 
+% 
+% for i=startIndex
+%     cCell = {};
+%     for j=1:length(finaloutputCopy)
+%         cCell = finaloutputCopy{j};
+%         for k = 1:size(cCell,1)
+%             hypoList{i+k-1} = cCell(k,:); 
+%         end       
+%     end 
+% end
 
-% Use startindex might work 
-
-for i=startIndex
-    cCell = {};
-    for j=1:length(finaloutputCopy)
-        cCell = finaloutputCopy{j};
-        for k = 1:size(cCell,1)
-            hypoList{i+k-1} = cCell(k,:); 
-        end       
-    end 
-end
+testCell = {{{1},{2}},{3},{4}};
