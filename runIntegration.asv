@@ -1,5 +1,5 @@
  
- load('SaeediEricJoyceWorkspace.mat')
+load('SaeediEricJoyceWorkspace.mat')
 test1Segments = generateSegments('test1.png', finaloutput);
 save('test1Segments.mat','test1Segments'); 
 test2Segments = generateSegments('test2.png', finaloutput);

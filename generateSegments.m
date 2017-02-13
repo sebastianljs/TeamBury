@@ -84,7 +84,7 @@ for i = 1:length(segments)
     cHypoX = zeros(1,4);
     cHypoY = zeros(1,4);
     for j = 1:length(hypoList)
-%         if(mod(j,1000) == 0)
+%         if(mod(j, 0) == 0)
 %             fprintf('Calculating %d th hypo\n',j);
 %         end
         for k = 1:4
