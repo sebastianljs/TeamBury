@@ -1,4 +1,5 @@
-% globalHypothesisRefinement.m
+ % globalHypothesisRefinement.m
+clear; 
 bestHypoList1 = cellfun(@(x) x.bestHypothesis, test1Segments, 'UniformOutput',false);
 bestHypoList2 = cellfun(@(x) x.bestHypothesis, test2Segments, 'UniformOutput',false);
 bestHypoList3 = cellfun(@(x) x.bestHypothesis, test3Segments, 'UniformOutput',false);

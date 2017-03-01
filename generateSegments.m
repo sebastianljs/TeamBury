@@ -15,7 +15,7 @@ segments = cell(1,length(uniqVal));
 % get image width and height
 imageHeight = size(testImage,1);
 imageWidth = size(testImage, 2);
-for i=1:length(uniqVal)
+parfor i=1:length(uniqVal)
     % Get all the entries of testImage whose value is uniqVal
     myInd = (testImage == uniqVal(i));
     % Get the x, y coordinates that matches a segment
@@ -73,7 +73,7 @@ toc
 % end
 disp('Getting list coordinates ... done')
 %% Determine the hypotheses that overlaps with each segment
-for i = 1:length(segments)
+parfor i = 1:length(segments)
     
     fprintf('Calculating %d th segment\n',i);
     cSegment = segments{i};
@@ -126,7 +126,7 @@ for i = 1:length(segments)
         inRegion = ismember(xAll, xIn) & ismember(yAll, yIn);
         pointsIn = points(inRegion,:);
         overlappingHypoRegions{j} = pointsIn;
-    end
+    end 
     fprintf('Calculating overlapping hypo for %d th segment ... done\n',i);
 
     %% Assign hypotheses Probabilities and Regions 
