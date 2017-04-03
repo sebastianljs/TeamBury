@@ -1,13 +1,19 @@
  % globalHypothesisRefinement.m
-% test1Segments = generateSegmentNew('seg.png', testoutput);
-% test2Segments = generateSegmentNew('seg3.png', testoutput);
-% test3Segments = generateSegmentNew('seg3new.png', testoutput);
-% test4Segments = generateSegmentNew('seg4new.png', testoutput); 
+load('finalworkspaceforalltime.mat')
+test1Segments = generateSegmentNew('sampleseg1.png', finaloutput);
+test2Segments = generateSegmentNew('sampleseg2.png', finaloutput);
+test3Segments = generateSegmentNew('sampleseg3.png', finaloutput);
+test4Segments = generateSegmentNew('sampleseg4.png', finaloutput); 
 % Select best hypotheses for each image 
-load pic1_array;
-load pic2_array;
-load pic3_array;
-load pic4_array;
+% load pic1_array;
+% load pic2_array;
+% load pic3_array;
+% load pic4_array;
+test1Array = [test1Segments{:}];
+test2Array = [test2Segments{:}];
+test3Array = [test3Segments{:}];
+test4Array = [test4Segments{:}];
+
 
 picResults = {test1Array, test2Array, test3Array, test4Array}; 
 bestHypoList = cell(1, length(picResults)); 
@@ -28,7 +34,7 @@ for i = 1:length(picResults)
 end 
 clear('picResults'); 
 % Load image 
-testImage = imread('seg.png');
+testImage = imread('sampleseg1.png');
 testImage = rgb2gray(testImage); 
 [height, width] = size(testImage);  
 %% Create a list of coordinates 

@@ -1,20 +1,29 @@
  % globalHypothesisRefinement.m
 clear; 
+input = load('matlab_data/finaloutputFILE.mat'); 
+testoutput = input.finaloutput;
+clear('input'); 
+% test1Segments = generateSegmentNew('seg.png', testoutput);
+% test2Segments = generateSegmentNew('seg3.png', testoutput);
+test3Segments = generateSegmentNew('seg3new.png', testoutput);
+test4Segments = generateSegmentNew('seg4new.png', testoutput);
+clear('testoutput'); 
+% Select best hypotheses for each image 
 bestHypoList1 = cellfun(@(x) x.bestHypothesis, test1Segments, 'UniformOutput',false);
 bestHypoList2 = cellfun(@(x) x.bestHypothesis, test2Segments, 'UniformOutput',false);
 bestHypoList3 = cellfun(@(x) x.bestHypothesis, test3Segments, 'UniformOutput',false);
 bestHypoList4 = cellfun(@(x) x.bestHypothesis, test4Segments, 'UniformOutput',false);
-ind1 = find(cellfun(@isempty, bestHypoList1));
-ind2 = find(cellfun(@isempty, bestHypoList2));
-ind3 = find(cellfun(@isempty, bestHypoList3));
-ind4 = find(cellfun(@isempty, bestHypoList4));
-% Replace empty cell with paddings 
+ind1 = find(cellfun('isempty', bestHypoList1));
+ind2 = find(cellfun('isempty', bestHypoList2));
+ind3 = find(cellfun('isempty', bestHypoList3));
+ind4 = find(cellfun('isempty', bestHypoList4));
+% Replace empty cell with zero paddings 
 bestHypoList1(ind1) = {{zeros(2,8)}};
 bestHypoList2(ind2) = {{zeros(2,8)}};
 bestHypoList3(ind3) = {{zeros(2,8)}};
 bestHypoList4(ind4) = {{zeros(2,8)}};
 % Load image 
-testImage = imread('test1.png');
+testImage = imread('seg.png');
 testImage = rgb2gray(testImage); 
 [height, width] = size(testImage);  
 %% Create a list of coordinates 
@@ -23,16 +32,16 @@ points = [x(:), y(:)];
 xAll = points(:,1);
 yAll = points(:,2); 
 % Get all x coordinates of vertices of hypothesis edges 
-xCoord1 = cellfun(@(x) x{1}(1, [1,3,5,7]), bestHypoList1, 'UniformOutput', false);
-xCoord2 = cellfun(@(x) x{1}(1, [1,3,5,7]), bestHypoList2, 'UniformOutput', false); 
-xCoord3 = cellfun(@(x) x{1}(1, [1,3,5,7]), bestHypoList3, 'UniformOutput', false); 
-xCoord4 = cellfun(@(x) x{1}(1, [1,3,5,7]), bestHypoList4, 'UniformOutput', false);
+xCoord1 = cellfun(@(x) x{1}(1, :), bestHypoList1, 'UniformOutput', false);
+xCoord2 = cellfun(@(x) x{1}(1, :), bestHypoList2, 'UniformOutput', false); 
+xCoord3 = cellfun(@(x) x{1}(1, :), bestHypoList3, 'UniformOutput', false); 
+xCoord4 = cellfun(@(x) x{1}(1, :), bestHypoList4, 'UniformOutput', false);
 
 % Get all y coordinates of vertices of hypothesis edges 
-yCoord1 = cellfun(@(x) x{1}(2, [1,3,5,7]), bestHypoList1, 'UniformOutput', false);
-yCoord2 = cellfun(@(x) x{1}(2, [1,3,5,7]), bestHypoList2, 'UniformOutput', false); 
-yCoord3 = cellfun(@(x) x{1}(2, [1,3,5,7]), bestHypoList3, 'UniformOutput', false); 
-yCoord4 = cellfun(@(x) x{1}(2, [1,3,5,7]), bestHypoList4, 'UniformOutput', false); 
+yCoord1 = cellfun(@(x) x{1}(2, :), bestHypoList1, 'UniformOutput', false);
+yCoord2 = cellfun(@(x) x{1}(2, :), bestHypoList2, 'UniformOutput', false); 
+yCoord3 = cellfun(@(x) x{1}(2, :), bestHypoList3, 'UniformOutput', false); 
+yCoord4 = cellfun(@(x) x{1}(2, :), bestHypoList4, 'UniformOutput', false); 
 
 % Check if each point is in polygon using inpolygon 
 pointsInPolygon1 = cellfun(@(x,y) inpolygon(xAll, yAll, x', y'), xCoord1, yCoord1, 'UniformOutput', false);

@@ -22,8 +22,8 @@ for i = 1:length(hypoList)
     
     yCoord = edgesCoord{i}(:,[2, 4, 6, 8]);
     k = convhull(xCoord,yCoord);
-%     hold on
-%     plot(xCoord(k), yCoord(k), 'LineWidth',3,'Color','r')
+    hold on
+    plot(xCoord(k), yCoord(k), 'LineWidth',3,'Color','r')
     edgesCoord{i} = cat(2, xCoord(k), yCoord(k));
 end
 %% Flatten test image
@@ -109,7 +109,6 @@ for i = 1:length(segments)
     cSegment.bestHypothesis = bestHypothesis;
     cSegment.highScore = highScore;
     segments{i} = cSegment;
-    disp(segments{i})
-       
+%     disp(segments{i})     
 end
 end

@@ -9,6 +9,7 @@ classdef Segment < handle
     end 
     
     methods     
+        
         function S = Segment(segmentRegion, hypothesisRegions, hypothesisEdges, hypothesisProbability)
             % Constructor 
             S.segmentRegion = segmentRegion;
@@ -45,8 +46,8 @@ classdef Segment < handle
 %             end            
         end 
         function [bestHypothesis, highScore] = findHighScore(S, normalizedRatios, percentageOverlap)
-            % Find highest score for given list of hypotheses 
-            meanScore = (S.hypothesisProbability + normalizedRatios + percentageOverlap)/3;
+            % Find highest score for given list of hypotheses
+            meanScore = (transpose(S.hypothesisProbability) + normalizedRatios + percentageOverlap)/3;
             [~, idx] = max(meanScore);
             highScore = meanScore(idx);
             bestHypothesis = S.hypothesisEdges(idx);
